@@ -1,4 +1,4 @@
-Date of report : 2016-01-11 21:12:14 +0100
+Date of report : 2016-01-11 21:44:03 +0100
                                                                                 
                                                                                 
  _________      .__                  __________                             __  
@@ -49,3 +49,15 @@ Average price for the reference without the shipping cost: 189.99$
 |_.__/|_|  \__,_|_| |_|\__,_|___/
                                                                                 
                
+***********************************************************************
+Sales information for the brand LEGO
+Number of the stock units available: 55
+Number of toys references 2
+Average price of the brand toys: 111.49$
+Total amount of sales for the brand without shipping cost: 416.96$
+***********************************************************************
+Sales information for the brand Nano Blocks
+Number of the stock units available: 12
+Number of toys references 1
+Average price of the brand toys: 49.99$
+Total amount of sales for the brand without shipping cost: 68.98$
