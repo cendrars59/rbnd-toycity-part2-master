@@ -1,17 +1,7 @@
-# **********************************************************************************************************
-# ----------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------
 # required librairies // Don't know if Gem is better than librairies in Ruby
-# ----------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------
 require 'json'
 
-# **********************************************************************************************************
-# ----------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------
 # Files init for the report generation
-# ----------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------
 def setup_files
     path = File.join(File.dirname(__FILE__), '../data/products.json')
     file = File.read(path)
@@ -19,30 +9,23 @@ def setup_files
     $report_file = File.new("report.txt", "w+")
 end
 
-
-# **********************************************************************************************************
-# ----------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------
 # Unit Methods to re-use in to the project
 # ----------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------
-# **********************************************************************************************************
 
-
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Simple method to separate the diffrent topics
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
+# Method to separate the diffrent topics
 def separator
 	puts "                                                                       "
 	puts "***********************************************************************"
 	puts "                                                                       "
 end
 
+# Method to get the current date to print on the report
 def report_date
-	"Date of report : #{Time.now}"
+	"Date of report : #{Time.now.strftime("Printed on %m/%d/%Y")}"
 end
 
+# Several methods to manage the header of each part of the report
 def print_sales_label_ascii(file)
 	file.puts("                                                                                ")
 	file.puts("                                                                                ")
@@ -84,32 +67,23 @@ def print_brands_label_ascii(file)
 	file.puts("               ")
 end
 
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
 # Func_Requ_01
 # Criteria : Print today's date on the report + Sales report label in ASCII
 #
-# ###############################################################################
 # Required Specifications :
-#
 # => Print Sales Report date
 # => Print Sales report label
-#
-#
-#
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-
 def print_heading(file)
 	file.puts(report_date)
   print_sales_label_ascii(file)
 end
 
 
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
 # Func_Requ_02
 # Criteria : Manage sales information related to the product onto the report
 #
-# ###############################################################################
 # For each product in the data set:
 # => (1) Print the name of the toy //// Done
 # => (2 )Print the retail price of the toy //// Done
@@ -117,108 +91,64 @@ end
 # => (4) Calculate and print the total amount of sales //// Done
 # => (5) Calculate and print the average price the toy sold for //// Done
 # => (6) Calculate and print the average discount (% or $) based off the average sales price
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-
 def make_product_section(file,products)
 
-	# ------------------------------------------------------------------------------
 	# Product label in ASCII ART
-	# ------------------------------------------------------------------------------
-
 	print_products_label_ascii(file)
 
-	# ------------------------------------------------------------------------------
 	# For each product in the data set:
-	# ------------------------------------------------------------------------------
 	products["items"].each do |toy|
 
-		# ---------------------------------------------------------------------------
 	  # (1) Print the name of the toy
-		# ---------------------------------------------------------------------------
 		file.puts "***********************************************************************"
 		file.puts "Product reference: #{toy["title"]}"
 
-		# ---------------------------------------------------------------------------
 	  # (2) Print the retail price of the toy
-		# ---------------------------------------------------------------------------
 		file.puts "Retail price: #{toy["full-price"]}$"
 
-		# ---------------------------------------------------------------------------
 	  # (3) Calculate and print the total number of purchases
-		# ---------------------------------------------------------------------------
 		file.puts "Number of purchases for this reference: #{toy["purchases"].length}"
 
-		# ---------------------------------------------------------------------------
 	  # (4) Calculate and print the total amount of sales
-		# ---------------------------------------------------------------------------
 		total_amount_sales = 0
 		toy["purchases"].each do |purchase|
 			total_amount_sales = total_amount_sales + purchase["price"]
 		end
 		file.puts "Total amount of sales without the shipping cost: #{total_amount_sales}$"
 
-		# ---------------------------------------------------------------------------
 	  # (5) Calculate and print the average price the toy sold for
-		# ---------------------------------------------------------------------------
 		file.puts "Average price for the reference without the shipping cost: #{total_amount_sales/toy["purchases"].length}$"
 
-		# ---------------------------------------------------------------------------
 	  # (6) Calculate and print the average discount (% or $) based off the average sales price
-		#
-		# ---------------------------------------------------------------------------
-
 		file.puts("Average of discount: #{(toy["full-price"].to_f-(total_amount_sales/toy["purchases"].length)).round(2)}$")
 		file.puts "Percentage of discount: #{((toy["full-price"].to_f-(total_amount_sales/toy["purchases"].length))/toy["full-price"].to_f).round(2)*100}%"
-
 	end
 end # End of the method
 
-
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Simple method to get the list of brands according the JSON file provided
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# Method to get the list of brands according the JSON file provided
 def get_the_list_of_brands(file)
 	brands = Array.new
 	file["items"].each do |toy|
-		already_exist = false
-		brands.each do |brand|
-			if brand == toy["brand"]
-				already_exist = true
-			end
-		end
-		if already_exist == false
-			brands.push(toy["brand"])
-		end
+	   brands.push(toy["brand"])
 	end
-	return brands
+	return brands.uniq!
 end
 
-
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # Func_Requ_03
 # Criteria : Manage sales information related to the brand onto the report
 #
-# ###############################################################################
 # For each brand in the data set:
 # => (1) Print the name of the brand
 # => (2) Count and print the number of the brand's toys we stock
 # => (3) Calculate and print the average price of the brand's toys
 # => (4) Calculate and print the total sales volume of all the brand's toys combined
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 def make_brand_section(file,products)
 
-	# ------------------------------------------------------------------------------
+
 	# Brands label in ASCII ART
-	# ------------------------------------------------------------------------------
 	print_brands_label_ascii(file)
 
-
-	# -----------------------------------------------------------------------------
-	# Genarating the report by brand according the list of brands gathered into the
-	# file.
-	# -----------------------------------------------------------------------------
-
+	# Genarating the report by brand according the list of brands gathered into the file.
 	get_the_list_of_brands(products).each do |brand|
 
 		# Var initialization by brand
@@ -231,27 +161,19 @@ def make_brand_section(file,products)
 			toy["brand"] == brand
 		end
 
-		# ---------------------------------------------------------------------------
 		# (1) Print the name of the brand
-		# ---------------------------------------------------------------------------
 		file.puts("***********************************************************************")
 		file.puts("Sales information for the brand #{brand}")
 
-		# ---------------------------------------------------------------------------
 		# (2) Count and print the number of the brand's toys we stock
-		# ---------------------------------------------------------------------------
 		nb_stocked_unit = 0
 		toys_list.each do |toy|
 			nb_stocked_unit = nb_stocked_unit + toy["stock"]
 		end
 		file.puts("Number of the stock units available: #{nb_stocked_unit}")
 
-
-		# ---------------------------------------------------------------------------
 		# (3) Calculate and print the average price of the brand's toys
 		# Average price = sum of the toy's prices / number of toys
-		# ---------------------------------------------------------------------------
-
 		total_sum_prices = 0
 		total_toys_ref = 0
 		toys_list.each do |toy|
@@ -265,9 +187,7 @@ def make_brand_section(file,products)
 		file.puts "Number of toys references #{total_toys_ref}"
 		file.puts "Average price of the brand toys: #{(total_sum_prices/total_toys_ref).round(2)}$"
 
-		# ---------------------------------------------------------------------------
 		# (4) Calculate and print the total sales volume of all the brand's toys combined
-		# ---------------------------------------------------------------------------
 		toys_list.each do |toy|
 			total_amount_sales_toy = 0
 			total_purchases_toys = 0
@@ -287,35 +207,21 @@ def make_brand_section(file,products)
 	end
 end
 
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# Print data method is used to gather and fill the report information related to
-# the sales by product and by brand
-#
-#
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+# Print data method is used to gather and fill the report information related to the sales by product and by brand
 def print_data(file,products)
 		make_product_section(file,products)
 		make_brand_section(file,products)
 end
 
-
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #  create_report method is used to generate the file
-#
-#
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 def create_report
 	setup_files
 	print_heading($report_file)
 	print_data($report_file,$products_hash)
 end
 
-
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # Main method executed into the main programm in order to generate the report
-#
-#
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 def start
 	separator
 	puts "The sales report is generating please wait for the end of execution at #{Time.now}"
@@ -326,18 +232,12 @@ def start
 end
 
 
-# **********************************************************************************************************
-# ----------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------
 # 																							Main programm
 # ----------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------
-# **********************************************************************************************************
 
 start
 
-# //////////////////////////////////////////////////////////////////////////////////////////////////////////
-# //////////////////////////////////////////////////////////////////////////////////////////////////////////
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////
 # 																								End of file
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////
