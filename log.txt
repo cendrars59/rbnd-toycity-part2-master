@@ -1,0 +1,23 @@
+commit 29fb2a40840efef1acb24d9f14b5cc14fad50137
+Author: Cyril Leroux <cyr.leroux@outlook.com>
+Date:   Tue Jan 12 00:00:41 2016 +0100
+
+    Encoding average calculation for the product
+
+commit 85dc8f30d7b7a63605a237a2f6c35607c25f414e
+Author: Cyril Leroux <cyr.leroux@outlook.com>
+Date:   Mon Jan 11 21:45:43 2016 +0100
+
+    Encoding the methods for the sales information according the brand
+
+commit c3d81b18df7c1e64bf2056e7c36bab5cc4ba6dcb
+Author: Cyril Leroux <cyr.leroux@outlook.com>
+Date:   Mon Jan 11 21:14:42 2016 +0100
+
+    Encoding the methods for the sales information according the product
+
+commit 9aa4c1d9e01ed8a12a21be05f1a3c5c87f36058c
+Author: Cyril Leroux <cyr.leroux@outlook.com>
+Date:   Sun Jan 10 22:00:24 2016 +0100
+
+    Initial commit. Main function creation
