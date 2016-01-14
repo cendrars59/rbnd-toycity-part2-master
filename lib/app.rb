@@ -9,6 +9,7 @@ def setup_files
     $report_file = File.new("report.txt", "w+")
 end
 
+
 # ----------------------------------------------------------------------------------------------------------
 # Unit Methods to re-use in to the project
 # ----------------------------------------------------------------------------------------------------------
@@ -121,7 +122,7 @@ def make_product_section(file,products)
 
 	  # (6) Calculate and print the average discount (% or $) based off the average sales price
 		file.puts("Average of discount: #{(toy["full-price"].to_f-(total_amount_sales/toy["purchases"].length)).round(2)}$")
-		file.puts "Percentage of discount: #{((toy["full-price"].to_f-(total_amount_sales/toy["purchases"].length))/toy["full-price"].to_f).round(2)*100}%"
+		file.puts("Percentage of discount: #{((toy["full-price"].to_f-(total_amount_sales/toy["purchases"].length))/toy["full-price"].to_f).round(2)*100}%")
 	end
 end # End of the method
 
@@ -134,6 +135,75 @@ def get_the_list_of_brands(file)
 	return brands.uniq!
 end
 
+end
+
+def cumulated_result(list,cumulated,to_cumulate)
+  cumulated = 0
+  list.each do |item|
+    cumulated = cumulated + item[to_cumulate]
+  end
+  return cumulated
+end
+
+def iteration_number(list,cumulated)
+  cumulated = 0
+  list.each do |item|
+    cumulated = cumulated + 1
+  end
+  return cumulated
+end
+
+
+def make_brand_section_business_logic(products,results)
+  # Genarating the report by brand according the list of brands gathered into the file.
+  get_the_list_of_brands(products).each do |brand|
+
+    # Products selection by brand
+    toys_list = products["items"].select do |toy|
+      toy["brand"] == brand
+    end
+
+    # (1) Print the name of the brand
+    results.push("*********************************************************************** \n Sales information for the brand #{brand}")
+
+    # (2) Count and print the number of the brand's toys we stock
+    nb_stocked_unit = cumulated_result(toys_list,nb_stocked_unit,"stock")
+    results.push("Number of the stock units available: #{nb_stocked_unit}")
+
+    # (3) Calculate and print the average price of the brand's toys : Average price = sum of the toy's prices / number of toys
+    total_sum_prices = 0
+    toys_list.each do |toy|
+      # Calculate the total amount of sales for one toy reference for one brand For one refrence , make the sum of the amount of the purchases
+      total_sum_prices = total_sum_prices + toy["full-price"].to_f
+    end
+    total_toys_ref = iteration_number(toys_list,total_toys_ref)
+    results.push("Number of toys references #{total_toys_ref}\nAverage price of the brand toys: #{(total_sum_prices/  total_toys_ref).round(2)}$")
+
+    # (4) Calculate and print the total sales volume of all the brand's toys combined
+    total_amount_sales_brand = 0
+    toys_list.each do |toy|
+      total_amount_sales_toy = 0
+      # Calculate the total amount of sales for one toy reference for one brand For one refrence , make the sum of the amount of the purchases
+      toy["purchases"].each do |purchase|
+        total_amount_sales_toy = total_amount_sales_toy + purchase["price"]
+      end
+      # Calculate and print the total amount of sales for all toys references for one brand Make the sum of the totals of the purchases by produduct
+      total_amount_sales_brand = total_amount_sales_brand + total_amount_sales_toy
+    end
+    results.push( "Total amount of sales for the brand without shipping cost: #{total_amount_sales_brand.round(2)}$")
+  end
+end
+
+
+def make_brand_section_copy_to_file(file,results)
+  # Brands label in ASCII ART
+	print_brands_label_ascii(file)
+  results.each do |result|
+    file.puts(result)
+  end
+end
+
+
 # Func_Requ_03
 # Criteria : Manage sales information related to the brand onto the report
 #
@@ -143,68 +213,9 @@ end
 # => (3) Calculate and print the average price of the brand's toys
 # => (4) Calculate and print the total sales volume of all the brand's toys combined
 def make_brand_section(file,products)
-
-
-	# Brands label in ASCII ART
-	print_brands_label_ascii(file)
-
-	# Genarating the report by brand according the list of brands gathered into the file.
-	get_the_list_of_brands(products).each do |brand|
-
-		# Var initialization by brand
-
-		total_amount_sales_brand = 0
-		total_amount_purchase_brand = 0
-
-		# Products selection by brand
-		toys_list = products["items"].select do |toy|
-			toy["brand"] == brand
-		end
-
-		# (1) Print the name of the brand
-		file.puts("***********************************************************************")
-		file.puts("Sales information for the brand #{brand}")
-
-		# (2) Count and print the number of the brand's toys we stock
-		nb_stocked_unit = 0
-		toys_list.each do |toy|
-			nb_stocked_unit = nb_stocked_unit + toy["stock"]
-		end
-		file.puts("Number of the stock units available: #{nb_stocked_unit}")
-
-		# (3) Calculate and print the average price of the brand's toys
-		# Average price = sum of the toy's prices / number of toys
-		total_sum_prices = 0
-		total_toys_ref = 0
-		toys_list.each do |toy|
-
-			# Calculate the total amount of sales for one toy reference for one brand
-			# For one refrence , make the sum of the amount of the purchases
-
-			total_sum_prices = total_sum_prices + toy["full-price"].to_f
-			total_toys_ref = total_toys_ref + 1
-		end
-		file.puts "Number of toys references #{total_toys_ref}"
-		file.puts "Average price of the brand toys: #{(total_sum_prices/total_toys_ref).round(2)}$"
-
-		# (4) Calculate and print the total sales volume of all the brand's toys combined
-		toys_list.each do |toy|
-			total_amount_sales_toy = 0
-			total_purchases_toys = 0
-			# Calculate the total amount of sales for one toy reference for one brand
-			# For one refrence , make the sum of the amount of the purchases
-			toy["purchases"].each do |purchase|
-				total_amount_sales_toy = total_amount_sales_toy + purchase["price"]
-				total_purchases_toys = total_purchases_toys + 1
-			end
-
-			# Calculate and print the total amount of sales for all toys references for one brand
-			# Make the sum of the totals of the purchases by produduct
-			total_amount_sales_brand = total_amount_sales_brand + total_amount_sales_toy
-			total_amount_purchase_brand = total_amount_purchase_brand + total_purchases_toys
-		end
-		file.puts( "Total amount of sales for the brand without shipping cost: #{total_amount_sales_brand.round(2)}$")
-	end
+  results = Array.new
+  make_brand_section_business_logic(products,results)
+  make_brand_section_copy_to_file(file,results)
 end
 
 
