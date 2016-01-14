@@ -135,7 +135,6 @@ def get_the_list_of_brands(file)
 	return brands.uniq!
 end
 
-end
 
 def cumulated_result(list,cumulated,to_cumulate)
   cumulated = 0

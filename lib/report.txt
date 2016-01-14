@@ -59,13 +59,11 @@ Percentage of discount: 5.0%
  Sales information for the brand LEGO
 Number of the stock units available: 55
 Number of toys references 2
-     
 Average price of the brand toys: 111.49$
 Total amount of sales for the brand without shipping cost: 416.96$
 *********************************************************************** 
  Sales information for the brand Nano Blocks
 Number of the stock units available: 12
 Number of toys references 1
-     
 Average price of the brand toys: 49.99$
 Total amount of sales for the brand without shipping cost: 68.98$
