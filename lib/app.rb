@@ -84,7 +84,7 @@ end
 def cumulated_result(list,cumulated,to_cumulate)
   cumulated = 0
   list.each do |item|
-    cumulated = cumulated + item[to_cumulate]
+    cumulated = cumulated + item[to_cumulate].to_f
   end
   return cumulated
 end
@@ -133,38 +133,36 @@ end
 
 # Func_Requ_02
 # Criteria : Manage sales information related to the product onto the report
-def make_product_section(file,products)
-
-  file.puts(print_products_label_ascii(file))
+def make_product_section_business_logic(products,products_results_to_print)
 
 	# For each product in the data set:
 	products["items"].each do |toy|
 
 	  # (1) Print the name of the toy
-		file.puts("#{$separtor}\nProduct reference: #{toy["title"]}")
+		products_results_to_print.push("#{$separtor}\nProduct reference: #{toy["title"]}")
 
 	  # (2) Print the retail price of the toy
-		file.puts("Retail price: #{toy["full-price"]}$")
+		products_results_to_print.push("Retail price: #{toy["full-price"]}$")
 
 	  # (3) Calculate and print the total number of purchases
-		file.puts("Number of purchases for this reference: #{toy["purchases"].length}")
+		products_results_to_print.push("Number of purchases for this reference: #{toy["purchases"].length}")
 
 	  # (4) Calculate and print the total amount of sales
     total_amount_sales = cumulated_result(toy["purchases"],total_amount_sales,"price")
-		file.puts("Total amount of sales without the shipping cost: #{total_amount_sales}$")
+		products_results_to_print.push("Total amount of sales without the shipping cost: #{total_amount_sales}$")
 
 	  # (5) Calculate and print the average price the toy sold for
-		file.puts("Average price for the reference without the shipping cost: #{total_amount_sales/toy["purchases"].length}$")
+		products_results_to_print.push("Average price for the reference without the shipping cost: #{total_amount_sales/toy["purchases"].length}$")
 
 	  # (6) Calculate and print the average discount (% or $) based off the average sales price
-		file.puts("Average of discount: #{(toy["full-price"].to_f-(total_amount_sales/toy["purchases"].length)).round(2)}$")
-	  file.puts("Percentage of discount: #{((toy["full-price"].to_f-(total_amount_sales/toy["purchases"].length))/toy["full-price"].to_f).round(2)*100}%")
+		products_results_to_print.push("Average of discount: #{(toy["full-price"].to_f-(total_amount_sales/toy["purchases"].length)).round(2)}$")
+	  products_results_to_print.push("Percentage of discount: #{((toy["full-price"].to_f-(total_amount_sales/toy["purchases"].length))/toy["full-price"].to_f).round(2)*100}%")
 
 	end
 end
 
 
-def make_brand_section_business_logic(products,results_to_print)
+def make_brand_section_business_logic(products,brands_results_to_print)
   # Genarating the report by brand according the list of brands gathered into the file.
   get_the_list_of_brands(products).each do |brand|
 
@@ -174,20 +172,16 @@ def make_brand_section_business_logic(products,results_to_print)
     end
 
     # (1) Print the name of the brand
-    results_to_print.push("#{$separtor}\n Sales information for the brand #{brand}")
+    brands_results_to_print.push("#{$separtor}\n Sales information for the brand #{brand}")
 
     # (2) Count and print the number of the brand's toys we stock
     nb_stocked_unit = cumulated_result(toys_list,nb_stocked_unit,"stock")
-    results_to_print.push("Number of the stock units available: #{nb_stocked_unit}")
+    brands_results_to_print.push("Number of the stock units available: #{nb_stocked_unit}")
 
     # (3) Calculate and print the average price of the brand's toys : Average price = sum of the toy's prices / number of toys
-    total_sum_prices = 0
-    toys_list.each do |toy|
-      # Calculate the total amount of sales for one toy reference for one brand For one refrence , make the sum of the amount of the purchases
-      total_sum_prices = total_sum_prices + toy["full-price"].to_f
-    end
+    total_sum_prices = cumulated_result(toys_list,total_sum_prices,"full-price")
     total_toys_ref = iteration_number(toys_list,total_toys_ref)
-    results_to_print.push("Number of toys references #{total_toys_ref}\nAverage price of the brand toys: #{(total_sum_prices/total_toys_ref).round(2)}$")
+    brands_results_to_print.push("Number of toys references #{total_toys_ref}\nAverage price of the brand toys: #{(total_sum_prices/total_toys_ref).round(2)}$")
 
     # (4) Calculate and print the total sales volume of all the brand's toys combined
     total_amount_sales_brand = 0
@@ -200,19 +194,24 @@ def make_brand_section_business_logic(products,results_to_print)
       total_amount_sales_brand = total_amount_sales_brand + total_amount_sales_toy
     end
 
-    results_to_print.push( "Total amount of sales for the brand without shipping cost: #{total_amount_sales_brand.round(2)}$")
-    
+    brands_results_to_print.push( "Total amount of sales for the brand without shipping cost: #{total_amount_sales_brand.round(2)}$")
+
   end
 end
 
-
+def make_product_section(file, products)
+  products_results_to_print = Array.new
+  make_product_section_business_logic(products,products_results_to_print)
+  copy_results_to_file(file,products_results_to_print,print_products_label_ascii(file))
+end
 
 
 # Func_Requ_03
 # Criteria : Manage sales information related to the brand onto the report
-def make_brand_section(file,products,results_to_print)
-    make_brand_section_business_logic(products,results_to_print)
-    copy_results_to_file(file,results_to_print,print_brands_label_ascii(file))
+def make_brand_section(file,products)
+    brands_results_to_print = Array.new
+    make_brand_section_business_logic(products,brands_results_to_print)
+    copy_results_to_file(file,brands_results_to_print,print_brands_label_ascii(file))
 end
 
 
@@ -220,7 +219,7 @@ end
 def print_data(file,products)
     results_to_print = Array.new
 		make_product_section(file,products)
-		make_brand_section(file,products,results_to_print)
+		make_brand_section(file,products)
 end
 
 
